@@ -23,8 +23,22 @@ export class CRUD{
         })
     }
     
-    getListItems = () =>{
-
+    getListItems = (context: WebPartContext, listName: string) : Promise <[]> =>{
+        let restUrl = context.pageContext.web.absoluteUrl + "/_api/web/GetByTitle('"+listName+"')/items",
+            listItems : any = [];
+        
+        return new Promise <[]> (async(resolve, reject)=>{
+            context.spHttpClient
+                .get(restUrl, SPHttpClient.configurations.v1)
+                .then((response: SPHttpClientResponse)=>{
+                    response.json().then((results: any)=>{
+                        listItems = results.d.results;
+                    })
+                    resolve(listItems);
+                }, (error:any)=>{
+                    reject("Error Occured: " + error);
+                })
+        })
     }
 
     getExtListItems = () =>{
