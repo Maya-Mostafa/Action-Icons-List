@@ -21,7 +21,8 @@ export default class ActionIconsListWebPart extends BaseClientSideWebPart<IActio
     const element: React.ReactElement<IActionIconsListProps> = React.createElement(
       ActionIconsList,
       {
-        description: this.properties.description
+        description: this.properties.description,
+        context: this.context
       }
     );
 
