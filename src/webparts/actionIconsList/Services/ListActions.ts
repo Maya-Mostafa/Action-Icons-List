@@ -22,3 +22,26 @@ export const getListItems = async (context: WebPartContext, listName: string) =>
 
     return listItems;
 };
+
+export const updateListItems = async(context: WebPartContext, listTitle:string, listItems: any, status: string) =>{
+    for(let listItem of listItems){
+        let restUrl = `${context.pageContext.web.absoluteUrl}/_api/web/lists/getByTitle('${listTitle}')/items(${listItem.ID})`;
+        let body = JSON.stringify({Status: status});
+
+        let spOptions: ISPHttpClientOptions = {
+            headers:{
+                Accept: "application/json;odata=nometadata", 
+                "Content-Type": "application/json;odata=nometadata",
+                "odata-version": "",
+                "IF-MATCH": "*",
+                "X-HTTP-Method": "MERGE",    
+            },
+            body: body
+        };
+        let _data = await context.spHttpClient.post(restUrl, SPHttpClient.configurations.v1, spOptions);
+        
+        if (_data.ok){
+            console.log('Item is updated!');
+        }
+    }
+};

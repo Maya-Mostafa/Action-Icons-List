@@ -4,20 +4,23 @@ import { IActionIconsListProps } from './IActionIconsListProps';
 // import { escape } from '@microsoft/sp-lodash-subset';
 
 import {DetailsList, Selection, MarqueeSelection, TextField, Announced, IColumn} from '@fluentui/react';
-import {getListItems} from '../Services/ListActions';
+import {getListItems, updateListItems} from '../Services/ListActions';
 
 
 export default function ActionIconsList (props:IActionIconsListProps) {
 
     const [listItems, setListItems] = React.useState([]);
     const [selectionDetails, setSelectionDetails] = React.useState('');
+    const [selectedItems, setSelectedItems] = React.useState([]);
 
     const _selection: any = new Selection({
-      onSelectionChanged: () => setSelectionDetails(_getSelectionDetails),
+      onSelectionChanged: () => {
+        setSelectionDetails(_getSelectionDetails);
+        setSelectedItems(_selection.getSelection());
+      }
     });
     const _getSelectionDetails = (): string => {
       const selectionCount = _selection.getSelectedCount();
-      console.log("_selection.getSelection()", _selection.getSelection());
       switch (selectionCount) {
         case 0:
           return 'No items selected';
@@ -43,12 +46,22 @@ export default function ActionIconsList (props:IActionIconsListProps) {
       });
     }, [listItems.length]);
 
+    const updateSelectedItems = (status: string) =>{
+      return ()=>{
+        updateListItems(props.context, 'Requests', selectedItems, status).then(()=>{
+          getListItems(props.context, 'Requests').then((results)=>{
+            setListItems(results);
+          });
+        });
+      };
+    };
+
     return (
       <div>
 
-        <div>
-          
-        </div>
+        <button onClick={updateSelectedItems('Final')}>Change State to 'Final'</button>&nbsp;
+        <button onClick={updateSelectedItems('Deferred')}>Change State to 'Deferred'</button>&nbsp;
+        <button onClick={updateSelectedItems('Completed')}>Change State to 'Completed'</button>
 
         <div>{selectionDetails}</div>
         {/* <TextField label="Filter by Title" onChange={onFilter} /> */}
